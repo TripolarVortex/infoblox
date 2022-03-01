@@ -38,7 +38,7 @@ gm_ip = '192.168.1.131'
 gm_user = 'admin'
 gm_pwd = 'infoblox'
 ea_name = 'GRE'
-ea_bulkadd = 100
+ea_bulkadd = 1000
 sslkeylog = True
 
 #
@@ -83,11 +83,15 @@ while go:
         ea['list_values'].append({'value': str(int(ea['list_values'][len(ea['list_values'])-1]['value'])+1)})
     r = requests.put(url, data=json.dumps(ea), headers=header, verify=False, auth=(gm_user, gm_pwd))
     if r.status_code != 200:
-        go = False
         print("Failed to add {} entries to list.".format(ea_bulkadd))
         print("Response code: {}".format(r.status_code))
         print("Error Message: {}".format(r.content))
         print("EA List Length: {}; attempted: {}".format(len(ea['list_values'])-ea_bulkadd, len(ea['list_values'])))
+        if ea_bulkadd == 1:
+            print("Exiting")
+            go = False
+        else:
+            ea_bulkadd = int(ea_bulkadd/4)+1
     else:
         print("Successfully updated EA list.")
 
